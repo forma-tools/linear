@@ -1,9 +1,13 @@
 [project]
-name = "linear-cli"
+name = "linear-forma-cli"
 version = "0.1.0"
-description = "Linear project management - issues, projects, teams, cycles"
+description = "Linear project management - issues, projects, cycles, teams, roadmaps, initiatives, customers"
 readme = "README.md"
 requires-python = ">=3.11"
+authors = [
+    { name = "0xDarkMatter" }
+]
+license = { text = "MIT" }
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
@@ -14,6 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
     "ruff>=0.3.0",
 ]
 
@@ -28,13 +33,20 @@ build-backend = "hatchling.build"
 packages = ["src/linear_cli"]
 
 [tool.forma]
-description = "Linear project management - issues, projects, teams, cycles"
-resources = ["issues", "projects", "teams", "cycles", "labels", "users"]
+description = "Linear project management - issues, projects, cycles, teams, roadmaps, initiatives, customers"
+resources = [
+    "issues", "projects", "teams", "cycles", "labels", "users",
+    "comments", "documents", "initiatives", "roadmaps", "webhooks",
+    "states", "customers", "attachments", "notifications", "templates",
+    "favorites", "releases", "organization", "views",
+]
 auth = "api_key"
 status = "experimental"
 origin = "forma"
 env-key = "LINEAR_API_KEY"
 api-url = "https://linear.app/settings/api"
+install = "uv pip install -e ."
+setup-notes = "Create a personal API key at Settings > Account > Security & Access"
 
 [tool.ruff]
 line-length = 100
@@ -45,3 +57,6 @@ select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.uv]
+exclude-newer = "7 days"
