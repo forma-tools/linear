@@ -240,6 +240,47 @@ def test_cache_clear_json(runner):
 
 
 # ===========================================================================
+# Resource group help tests
+# ===========================================================================
+
+
+@pytest.mark.parametrize(
+    "group,expected_cmds",
+    [
+        ("cycles", ["list", "get", "create"]),
+        ("labels", ["list", "get", "create"]),
+        ("users", ["list", "get", "me"]),
+        ("comments", ["list", "create", "delete"]),
+        ("documents", ["list", "get", "create", "search"]),
+        ("initiatives", ["list", "get", "create"]),
+        ("roadmaps", ["list", "get", "create"]),
+        ("webhooks", ["list", "get", "create"]),
+        ("states", ["list", "create"]),
+        ("customers", ["list", "get", "create"]),
+        ("attachments", ["list", "get", "create"]),
+        ("notifications", ["list", "get", "archive"]),
+        ("templates", ["list", "get", "create"]),
+        ("favorites", ["list", "create", "delete"]),
+        ("releases", ["list", "create"]),
+        ("organization", ["get", "update"]),
+        ("views", ["list", "get", "create"]),
+        ("milestones", ["list", "create"]),
+        ("relations", ["list", "create", "delete"]),
+        ("memberships", ["list", "create", "delete"]),
+        ("project-updates", ["list", "create", "delete"]),
+        ("emojis", ["list", "create", "delete"]),
+        ("integrations", ["list"]),
+        ("audit", ["list"]),
+    ],
+)
+def test_resource_group_help(runner, group, expected_cmds):
+    result = invoke(runner, group, "--help")
+    assert result.exit_code == 0
+    for cmd in expected_cmds:
+        assert cmd in result.stdout, f"Expected '{cmd}' in {group} help output"
+
+
+# ===========================================================================
 # auth required checks (exit code 2)
 # ===========================================================================
 
@@ -259,3 +300,39 @@ def test_projects_list_requires_auth(runner, unauthed):
 def test_teams_list_requires_auth(runner, unauthed):
     result = invoke(runner, "teams", "list", "--json")
     assert result.exit_code == 2
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        ["cycles", "list", "--json"],
+        ["labels", "list", "--json"],
+        ["users", "list", "--json"],
+        ["comments", "list", "--issue", "LIN-1", "--json"],
+        ["documents", "list", "--json"],
+        ["initiatives", "list", "--json"],
+        ["roadmaps", "list", "--json"],
+        ["webhooks", "list", "--json"],
+        ["states", "list", "--json"],
+        ["customers", "list", "--json"],
+        ["attachments", "list", "--json"],
+        ["notifications", "list", "--json"],
+        ["templates", "list", "--json"],
+        ["favorites", "list", "--json"],
+        ["releases", "list", "--json"],
+        ["organization", "get", "--json"],
+        ["views", "list", "--json"],
+        ["milestones", "list", "--json"],
+        ["relations", "list", "--json"],
+        ["memberships", "list", "--json"],
+        ["project-updates", "list", "--json"],
+        ["emojis", "list", "--json"],
+        ["integrations", "list", "--json"],
+        ["audit", "list", "--json"],
+    ],
+)
+def test_resource_requires_auth(runner, unauthed, cmd):
+    result = invoke(runner, *cmd)
+    assert result.exit_code == 2
+    data = parse_json(result)
+    assert data["error"]["code"] == "auth_required"
